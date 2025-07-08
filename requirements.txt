@@ -1,0 +1,25 @@
+# Core essentials
+numpy
+pandas
+opencv-python
+PyYAML
+scikit-learn
+matplotlib
+seaborn
+streamlit
+
+# Computer Vision
+torch
+torchvision
+ultralytics
+
+# Text detection & extraction
+pytesseract
+pdf2image
+
+# MLOps tracking
+mlflow
+
+# Optional
+scikit-image
+timm
