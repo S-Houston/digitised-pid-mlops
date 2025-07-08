@@ -205,3 +205,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# P&ID Project Data (ignore all data files)
+digitised-pid-mlops/data/
