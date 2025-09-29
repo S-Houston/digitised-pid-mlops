@@ -16,8 +16,18 @@ from src.postprocessing.text_extraction import process_text_files
 from src.postprocessing.image_deconstruction import slice_images
 from src.postprocessing.image_reconstruction import reconstruct_images
 
+# Switch between full Dataset or Demo mode
+demo_mode = True
+
+# Base source directory
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'Dataset'))
+
+if demo_mode:
+    source_dir = os.path.join(base_dir, 'Demo')
+else:
+    source_dir = base_dir
+
 # Define directories
-source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data'))
 image_dir = os.path.join(source_dir, 'Images')
 patches_dir = os.path.join(source_dir, 'Patches')
 object_detection_dir = os.path.join(source_dir, 'ObjectDetection')
@@ -31,10 +41,11 @@ if run_dirs:
     latest_run_dir = run_dirs[0]
     model_path = os.path.join(latest_run_dir, 'weights', 'best.pt')
 else:
-    raise FileNotFoundError("No training run directories found.")
+    raise FileNotFoundError("No YOLOv5 training runs found. Please train the model first.")
 
-# Load trained models
 model = load_model(model_path)
+
+# Load the pre-trained EAST text detection model
 text_model_path = os.path.join(os.path.dirname(__file__), 'models', 'frozen_east_text_detection.pb')
 
 # Streamlit app
