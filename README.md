@@ -96,7 +96,7 @@ flowchart TD
 
 5. Post-processing – Merges OCR results with detected symbols to build structured outputs
 
-6. Evaluation – Precision, recall, and mean average precision (mAP) across 13 classes
+6. Evaluation – Precision, recall, and mean average precision (mAP) across 19 classes
 
 7. Streamlit Visualisation – Interactive dashboard to explore detection outputs and model performance
 
@@ -114,7 +114,7 @@ flowchart TD
 
 ## Model Performance
 
-The YOLOv5 detector was trained on a labelled dataset of 1,694 objects across 13 P&ID component classes. Evaluation metrics are summarised below:
+The YOLOv5 detector was trained on a labelled dataset of 1,694 objects across 19 P&ID component classes. Evaluation metrics are summarised below:
 
 | Class                            | Instances | Precision | Recall    | mAP@0.5   | mAP@0.5:0.95 |
 | -------------------------------- | --------- | --------- | --------- | --------- | ------------ |
