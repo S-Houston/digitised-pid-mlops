@@ -1,25 +1,36 @@
-# Core essentials
-numpy
-pandas
-opencv-python
-PyYAML
-scikit-learn
-matplotlib
-seaborn
-streamlit
+# Core Python packages
+numpy==1.26.4
+pandas==2.3.0
+scipy==1.16.0
+scikit-learn==1.7.0
+matplotlib==3.10.3
+seaborn==0.13.2
+patchify==0.2.3
+Pillow==11.3.0
+opencv-python==4.11.0
+pdf2image==1.17.0
+pytesseract==0.3.13
 
-# Computer Vision
-torch
-torchvision
-ultralytics
+# YOLOv5 / Ultralytics dependencies
+torch==2.7.1
+torchvision==0.22.1
+ultralytics==8.3.161
+ultralytics-thop==2.0.14
+tqdm==4.67.1
+pyyaml==6.0.2
 
-# Text detection & extraction
-pytesseract
-pdf2image
+# Streamlit & dashboard
+streamlit==1.46.1
 
-# MLOps tracking
-mlflow
+# Image processing / utilities
+scikit-image==0.25.2
+imageio==2.37.0
+tifffile==2025.6.11
 
-# Optional
-scikit-image
-timm
+# Optional: for notebook usage
+ipython==8.15.0
+jupyter_client==8.3.0
+matplotlib-inline==0.1.6
+
+# Optional: general utilities
+requests==2.32.4
