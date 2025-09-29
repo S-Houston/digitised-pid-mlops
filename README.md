@@ -201,9 +201,8 @@ Launch Streamlit dashboard
 conda activate pid
 streamlit run streamlit_app.py
 ```
-- By default, the app uses the full dataset (Dataset/).
-
-- For quick testing or demonstration, change source_dir = 'Dataset/Demo' in streamlit_app.py to use the demo P&IDs.
+Note:
+ - The Streamlit application is currently configured to run on the Demo subset of the dataset only. To run on the full dataset, the folder structure and app code would need adjustments to handle the Training, Validation, and Test subfolders.
 ---
 
 ## Why This Matters
