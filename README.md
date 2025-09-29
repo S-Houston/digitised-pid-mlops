@@ -1,6 +1,8 @@
+# P&ID Digitisation with Object Detection and OCR
+
 ## Overview  
 This project explores the automation of **Piping & Instrumentation Diagram (P&ID)** digitisation by combining:  
-- **Object detection (YOLOv8)** for engineering symbols  
+- **Object detection (YOLOv5)** for engineering symbols  
 - **Text detection (Frozen EAST)** for locating text regions  
 - **Optical character recognition (Tesseract OCR)** for extracting labels  
 
@@ -13,34 +15,58 @@ This work was completed as part of my role at **CNOOC International** and served
 
 ---
 
+## Folder Structure
+    
+    src/
+    ├── detection/
+    │ ├── east_text_detector.py
+    │ ├── models/
+    │ │ └── frozen_east_text_detection.pb
+    │ ├── object_detector_train.ipynb
+    │ ├── text_detection_model.py
+    │ └── yolo_object_detection.py
+    ├── main_app/
+    │ └── streamlit_app.py
+    ├── postprocessing/
+    │ ├── image_deconstruction.py
+    │ ├── image_reconstruction.py
+    │ └── text_extraction.py
+    └── preprocessing/
+    ├── Create_Test_Train_Validation_Splits.py
+    ├── images_to_patches.py
+    └── pdf_to_image_converter.py
+    Dataset/
+    └── ... full dataset of P&IDs ...
+    Demo/
+    └── ... small subset of P&IDs for quick testing ...
+    yolov5/
+    └── ... Ultralytics YOLOv5 cloned GitHub repo ...
+
+---
+
 ## Data Preparation & Pre-processing
 
 The P&IDs in the dataset are scanned documents, some up to 30 years old, stored as PDFs. Due to variability in size and scan quality, the following steps were applied:
 
-PDF to Image Conversion
-PDFs were converted to JPG images for compatibility with deep learning pipelines.
+- **PDF to Image Conversion**  
+  PDFs were converted to JPG images for compatibility with deep learning pipelines.
 
-Border Removal
-Borders were manually removed to simplify object detection. Line detection was considered out of scope.
+- **Border Removal**  
+  Borders were manually removed to simplify object detection. Line detection was considered out of scope.
 
-Dataset Split
-Images were split into Training (70%), Validation (15%), and Test (15%) sets.
+- **Dataset Split**  
+  Images were split into Training (70%), Validation (15%), and Test (15%) sets.
 
-Image Patching
-Large diagrams were divided into 448x448 pixel patches to enable efficient training.
+- **Image Patching**  
+  Large diagrams were divided into 448x448 pixel patches to enable efficient training.  
+  - Training set: 69 images → 1,895 patches → 8,200 objects annotated  
+  - Validation set: 22 images → 525 patches → 1,700 objects annotated  
 
-Training set: 69 images → 1,895 patches → 8,200 objects annotated
+- **Annotation**  
+  - **Symbols:** 19 classes annotated using CVAT. Some classes, such as Ball Valves, Field Instruments, and Flanges, dominate the dataset.  
+  - **Text:** 35,000 text instances were manually annotated across training and validation sets for evaluation, though automated detection was performed using Frozen EAST.  
 
-Validation set: 22 images → 525 patches → 1,700 objects annotated
-
-Annotation
-
-Symbols: 19 classes annotated using CVAT
-. Some classes, such as Ball Valves, Field Instruments, and Flanges, dominate the dataset.
-
-Text: 35,000 text instances were manually annotated across training and validation sets for evaluation, though automated detection was performed using Frozen EAST.
-
-Note: Class imbalance exists due to natural distribution; synthetic balancing was out of scope.
+**Note: Class imbalance exists due to natural distribution; synthetic balancing was out of scope.**
 
 ---
 
@@ -49,7 +75,7 @@ Note: Class imbalance exists due to natural distribution; synthetic balancing wa
 ```mermaid
 flowchart TD
     A[Input P&ID Diagram] --> B[Pre-processing]
-    B --> C[YOLOv8 Object Detection]
+    B --> C[YOLOv5 Object Detection]
     C --> D[Frozen EAST Text Detection]
     D --> E[Tesseract OCR]
     E --> F[Post-processing & Mapping]
@@ -60,25 +86,35 @@ flowchart TD
 
 ## Steps:
 
-Pre-processing – Image cleaning (binarisation, resizing) to improve clarity
+1. Pre-processing – Convert PDFs, clean images, create patches
 
-YOLOv8 Detection – Recognises valves, instruments, connectors, and other symbols
+2. YOLOv5 Detection – Recognises valves, instruments, connectors, and other symbols
 
-Frozen EAST – Detects text regions within diagrams
+3. Frozen EAST – Detects text regions within diagrams
 
-OCR (Tesseract) – Extracts text from detected regions
+4. OCR (Tesseract) – Extracts text from detected regions
 
-Post-processing – Merges OCR results with detected symbols to build structured outputs
+5. Post-processing – Merges OCR results with detected symbols to build structured outputs
 
-Evaluation – Precision, recall, and mean average precision (mAP) across 13 classes
+6. Evaluation – Precision, recall, and mean average precision (mAP) across 13 classes
 
-Streamlit Visualisation – Interactive dashboard to explore detection outputs and model performance
+7. Streamlit Visualisation – Interactive dashboard to explore detection outputs and model performance
+
+---
+
+## Model Training (Optional)
+
+- YOLOv5 can be retrained on your dataset using object_detector_train.ipynb in src/detection/.
+
+- Pre-trained weights are stored under yolov5/runs/train/ and loaded automatically by the Streamlit app.
+
+- The EAST text detector (frozen_east_text_detection.pb) is loaded automatically by the Streamlit app.
 
 ---
 
 ## Model Performance
 
-The YOLOv8 detector was trained on a labelled dataset of 1,694 objects across 13 P&ID component classes. Evaluation metrics are summarised below:
+The YOLOv5 detector was trained on a labelled dataset of 1,694 objects across 13 P&ID component classes. Evaluation metrics are summarised below:
 
 | Class                            | Instances | Precision | Recall    | mAP@0.5   | mAP@0.5:0.95 |
 | -------------------------------- | --------- | --------- | --------- | --------- | ------------ |
@@ -102,11 +138,11 @@ The YOLOv8 detector was trained on a labelled dataset of 1,694 objects across 13
 
 Highlights:
 
-Strong results for common components such as Ball Valves and Field Instruments
+- Strong results for common components such as Ball Valves and Field Instruments
 
-Lower performance for rare classes (e.g. regulators with <3 instances) → future work requires balanced training data
+- Lower performance for rare classes (e.g. regulators with <3 instances) → future work requires balanced training data
 
-Overall metrics show that P&ID digitisation with CV methods is feasible and scalable given sufficient labelled data
+- Overall metrics show that P&ID digitisation with CV methods is feasible and scalable given sufficient labelled data
 
 --- 
 
@@ -114,15 +150,15 @@ Overall metrics show that P&ID digitisation with CV methods is feasible and scal
 
 This project was conducted as a research proof-of-concept. The following points outline areas for further development:
 
-Data imbalance: Rare components under-represented → additional labelled examples needed
+- Data imbalance: Rare components under-represented → additional labelled examples needed
 
-OCR accuracy: Sensitive to font size/quality → could improve with better preprocessing or transformer-based OCR
+- OCR accuracy: Sensitive to font size/quality → could improve with better preprocessing or transformer-based OCR
 
-Symbol-text mapping: Future extension to link text labels directly to symbols
+- Symbol-text mapping: Future extension to link text labels directly to symbols
 
-Deployment: Containerisation (Docker) or API layer (FastAPI/Streamlit) for production-ready usage
+- Deployment: Containerisation (Docker) or API layer (FastAPI/Streamlit) for production-ready usage
 
-MLOps extensions: MLflow for experiment tracking, CI/CD pipelines, scalable data processing
+- MLOps extensions: MLflow for experiment tracking, CI/CD pipelines, scalable data processing
 
 ---
 
@@ -130,15 +166,11 @@ MLOps extensions: MLflow for experiment tracking, CI/CD pipelines, scalable data
 
 Due to confidentiality of the underlying P&IDs, no sample diagrams or outputs are included in this repository. However, the following are provided to ensure reproducibility:
 
-Config files (configs/) to set model weights and thresholds
+- Preprocessing scripts included in src/preprocessing/
 
-Pipeline runner (pipeline.py) for end-to-end execution
+- Trained YOLOv5 weights stored in yolov5/runs/train/
 
-Utility modules (utils/) for visualisation and post-processing
-
-Streamlit app (streamlit_app.py) to interactively explore results
-
-Requirements file for environment setup
+- EAST model included under src/detection/models/
 
 ---
 
@@ -161,29 +193,28 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the pipeline on an input directory of diagrams (replace paths as needed):
-
-```Python
-python pipeline.py --config configs/default.yaml --input data/ --output outputs/
-```
+Activate environment and navigate to src/main_app
 
 Launch Streamlit dashboard
 
 ```Python
+conda activate pid
 streamlit run streamlit_app.py
 ```
+- By default, the app uses the full dataset (Dataset/).
 
+- For quick testing or demonstration, change source_dir = 'Dataset/Demo' in streamlit_app.py to use the demo P&IDs.
 ---
 
 ## Why This Matters
 
 P&IDs are central to process safety and asset management in oil & gas. By digitising them:
 
-Engineers can access information faster and with fewer manual errors
+- Engineers can access information faster and with fewer manual errors
 
-Diagrams can be integrated into predictive maintenance workflows, linking tags with sensor data
+- Diagrams can be integrated into predictive maintenance workflows, linking tags with sensor data
 
-Legacy documentation can be made machine-readable, unlocking value in decades of historical records
+- Legacy documentation can be made machine-readable, unlocking value in decades of historical records
 
 This project demonstrates end-to-end applied data science: computer vision, OCR, data engineering, evaluation, and delivery via an interactive app balancing research rigour with practical pathways to production.
 
