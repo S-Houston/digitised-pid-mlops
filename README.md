@@ -13,7 +13,7 @@ The aim was to demonstrate that complex engineering diagrams can be converted in
 
 The trained YOLOv5 model achieves **high precision and recall for frequently occurring components** such as Ball Valves, Field Instruments, and Platform Control Systems, demonstrating the feasibility of automated P&ID digitisation. Rare components such as certain regulators remain challenging due to limited training examples.  
 
-This work was completed as part of my role at **CNOOC International** and served as a **proof-of-concept** for digitising several hundred diagrams across multiple assets.  
+This work served as a **proof-of-concept** for digitising several hundred diagrams across multiple assets.  
 
 ---
 
