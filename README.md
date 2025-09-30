@@ -24,7 +24,7 @@ This work was completed as part of my role at **CNOOC International** and served
     │ ├── east_text_detector.py
     │ ├── models/
     │ │ └── frozen_east_text_detection.pb
-    │ ├── object_detector_train.ipynb
+    │ ├── object_detector_train.py
     │ ├── text_detection_model.py
     │ └── yolo_object_detection.py
     ├── main_app/
