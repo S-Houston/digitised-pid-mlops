@@ -119,7 +119,7 @@ def extract_original_filename(filename):
 
 # Step 5: Display extracted text and identified symbols for the selected image
 if selected_image_path:
-    st.image(Image.open(selected_image_path), caption='Selected Image', use_column_width=True)
+    st.image(Image.open(selected_image_path), caption='Selected Image', use_container_width=True)
     
     # Process text files and get the DataFrame for selected image
     df = process_text_files(text_detection_dir)

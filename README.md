@@ -8,8 +8,10 @@ This project explores the automation of **Piping & Instrumentation Diagram (P&ID
 
 The aim was to demonstrate that complex engineering diagrams can be converted into structured, machine-readable formats, enabling:  
 - Faster search and retrieval of engineering information  
-- Reduction in manual effort required to interpret diagrams  
+- Significant reduction in manual effort required to interpret diagrams  
 - A foundation for integrating P&IDs into analytics and predictive maintenance workflows  
+
+The trained YOLOv5 model achieves **high precision and recall for frequently occurring components** such as Ball Valves, Field Instruments, and Platform Control Systems, demonstrating the feasibility of automated P&ID digitisation. Rare components such as certain regulators remain challenging due to limited training examples.  
 
 This work was completed as part of my role at **CNOOC International** and served as a **proof-of-concept** for digitising several hundred diagrams across multiple assets.  
 
@@ -74,13 +76,14 @@ The P&IDs in the dataset are scanned documents, some up to 30 years old, stored 
 
 ```mermaid
 flowchart TD
-    A[Input P&ID Diagram] --> B[Pre-processing]
-    B --> C[YOLOv5 Object Detection]
-    C --> D[Frozen EAST Text Detection]
-    D --> E[Tesseract OCR]
-    E --> F[Post-processing & Mapping]
-    F --> G[Structured Outputs]
-    G --> H[Evaluation & Metrics]
+    A[Input P&ID Diagram] --> B[Pre-processing: PDF → Images, Patch, Clean]
+    B --> C[YOLOv5 Object Detection: Valves, Instruments, Connectors]
+    C --> D[Frozen EAST Text Detection: Locate Text Regions]
+    D --> E[Tesseract OCR: Extract Text from Regions]
+    E --> F[Post-processing & Mapping: Merge Symbols & Text]
+    F --> G[Structured Outputs: Machine-readable P&ID Data]
+    G --> H[Evaluation: Precision, Recall, mAP]
+    H --> I[Streamlit Dashboard: Interactive Visualisation of Results]
 ```
 ---
 
@@ -116,33 +119,50 @@ flowchart TD
 
 The YOLOv5 detector was trained on a labelled dataset of 1,694 objects across 19 P&ID component classes. Evaluation metrics are summarised below:
 
-| Class                            | Instances | Precision | Recall    | mAP@0.5   | mAP@0.5:0.95 |
-| -------------------------------- | --------- | --------- | --------- | --------- | ------------ |
-| Generic Valve                    | 99        | 0.982     | 0.818     | 0.889     | 0.679        |
-| Needle Valve                     | 86        | 0.926     | 1.000     | 0.994     | 0.852        |
-| Ball Valve                       | 405       | 0.952     | 0.975     | 0.987     | 0.857        |
-| Globe Valve                      | 17        | 0.510     | 0.941     | 0.921     | 0.753        |
-| Field Instruments                | 202       | 0.914     | 0.941     | 0.980     | 0.945        |
-| Platform Control System          | 113       | 0.965     | 0.970     | 0.988     | 0.936        |
-| Control Systems                  | 1         | 1.000     | 0.000     | 0.007     | 0.007        |
-| Local Panel Gauge Board          | 19        | 0.957     | 1.000     | 0.995     | 0.938        |
-| Reducer                          | 130       | 0.928     | 0.969     | 0.986     | 0.786        |
-| Flange                           | 473       | 0.907     | 0.759     | 0.864     | 0.460        |
-| Butterfly Valve                  | 65        | 0.929     | 0.877     | 0.878     | 0.673        |
-| Pressure Reducing Regulator      | 2         | 0.577     | 1.000     | 0.663     | 0.531        |
-| Back Pressure Reducing Regulator | 1         | 0.322     | 1.000     | 0.497     | 0.448        |
-| Pressure Control Valve           | 10        | 0.827     | 0.900     | 0.887     | 0.708        |
-| Connector                        | 71        | 0.909     | 0.705     | 0.885     | 0.758        |
-| **All (avg)**                    | **1694**  | **0.84**  | **0.857** | **0.828** | **0.688**    |
+| Class                            | Instances | Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
+| -------------------------------- | --------- | --------- | ------ | ------- | ------------ |
+| Generic Valve                    | 99        | 0.924     | 0.869  | 0.900   | 0.709        |
+| Needle Valve                     | 86        | 0.909     | 1.000  | 0.993   | 0.836        |
+| Ball Valve                       | 405       | 0.934     | 0.990  | 0.989   | 0.855        |
+| Globe Valve                      | 17        | 0.575     | 1.000  | 0.940   | 0.782        |
+| Field Instruments                | 202       | 0.876     | 0.976  | 0.980   | 0.935        |
+| Platform Control System          | 113       | 0.926     | 0.982  | 0.992   | 0.948        |
+| Control Systems                  | 1         | 1.000     | 0.000  | 0.003   | 0.002        |
+| Local Panel Gauge Board          | 19        | 0.893     | 1.000  | 0.995   | 0.959        |
+| Reducer                          | 130       | 0.914     | 0.981  | 0.986   | 0.774        |
+| Flange                           | 473       | 0.842     | 0.787  | 0.863   | 0.479        |
+| Butterfly Valve                  | 65        | 0.931     | 0.862  | 0.873   | 0.663        |
+| Pressure Reducing Regulator      | 2         | 0.588     | 1.000  | 0.995   | 0.846        |
+| Back Pressure Reducing Regulator | 1         | 0.333     | 1.000  | 0.332   | 0.332        |
+| Pressure Control Valve           | 10        | 0.710     | 1.000  | 0.968   | 0.813        |
+| Connector                        | 71        | 0.872     | 0.915  | 0.942   | 0.752        |
+| **All (avg)**                    | 1694      | 0.815     | 0.891  | 0.850   | 0.712        |
+
 
 
 Highlights:
 
-- Strong results for common components such as Ball Valves and Field Instruments
+Strong performance on common components:
 
-- Lower performance for rare classes (e.g. regulators with <3 instances) → future work requires balanced training data
+- Ball Valve (mAP@0.5: 0.989, Recall: 0.990)
 
-- Overall metrics show that P&ID digitisation with CV methods is feasible and scalable given sufficient labelled data
+- Field Instruments (mAP@0.5: 0.980, Recall: 0.976)
+
+- Platform Control System (mAP@0.5: 0.992, Recall: 0.982)
+
+Improved consistency across valves:
+
+- Generic Valve, Needle Valve, Butterfly Valve all achieve >0.87 mAP@0.5
+
+Lower performance on rare components:
+
+- Regulators and Control Systems have very low support (1–2 instances) → future work should focus on balancing these classes
+
+Overall:
+
+- The model achieves 0.85 mAP@0.5 and 0.712 mAP@0.5:0.95 across 19 classes
+
+- Confirms that automated P&ID digitisation with CV methods is feasible and scalable given sufficient labelled data
 
 --- 
 
