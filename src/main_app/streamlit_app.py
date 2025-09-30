@@ -46,7 +46,8 @@ else:
 model = load_model(model_path)
 
 # Load the pre-trained EAST text detection model
-text_model_path = os.path.join(os.path.dirname(__file__), 'models', 'frozen_east_text_detection.pb')
+text_model_path = r"C:\Users\Stuart\Python\PID_MLOPS\digitised-pid-mlops\src\detection\models\frozen_east_text_detection.pb"
+print("File exists:", os.path.exists(text_model_path))
 
 # Streamlit app
 st.title('P&ID Image Processing Application')
